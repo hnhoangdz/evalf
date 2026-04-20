@@ -1,0 +1,32 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args:
+          - --exclude-files
+          - ^dist/|^\.venv/|^\.pytest_cache/
+
+  - repo: local
+    hooks:
+      - id: check-api-keys
+        name: check for hardcoded API keys (OpenAI, Anthropic, Gemini)
+        language: pygrep
+        entry: '(sk-proj-[A-Za-z0-9_\-]{20,}|sk-ant-[A-Za-z0-9_\-]{20,}|AIzaSy[A-Za-z0-9_\-]{33})'
+        types: [text]
+        exclude: '^(\.pre-commit-config\.yaml)$'
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.9
+    hooks:
+      - id: ruff-check
+        args:
+          - --fix
+      - id: ruff-format

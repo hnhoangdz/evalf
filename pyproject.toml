@@ -4,32 +4,111 @@ build-backend = "hatchling.build"
 
 [project]
 name = "evalf"
-version = "0.1.0"
+version = "1.0.0"
 description = "A lightweight OSS library to evaluate RAG systems with LLM-as-a-Judge."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
+license-files = ["LICENSE"]
 authors = [
   { name = "Hoang" }
 ]
 keywords = ["rag", "evaluation", "llm", "judge", "cli"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Quality Assurance",
+  "Typing :: Typed",
+]
 dependencies = [
+  "click>=8.1.8",
   "httpx>=0.27.0",
   "openai>=1.75.0",
   "pydantic>=2.8.0",
-  "pytest>=9.0.3",
+  "pydantic-settings>=2.6.1",
 ]
+
+[project.urls]
+Homepage = "https://github.com/hnhoangdz/evalf"
+Repository = "https://github.com/hnhoangdz/evalf"
+Issues = "https://github.com/hnhoangdz/evalf/issues"
 
 [project.optional-dependencies]
 dev = [
-  "pytest>=8.2.0",
+  "detect-secrets>=1.5.0",
+  "pre-commit>=4.0.0",
+  "pytest>=9.0.3",
+  "pytest-cov>=6.0.0",
+  "ruff>=0.15.0",
+  "twine>=6.1.0",
 ]
 
 [project.scripts]
 evalf = "evalf.cli:main"
+
+[tool.hatch.build]
+exclude = [
+  "/.codex",
+]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.codex",
+  "/.env",
+  "/.env.*",
+  "/.github",
+  "/.pytest_cache",
+  "/.venv",
+  "/.vscode",
+  "/dist",
+  "/htmlcov",
+  "/notebooks",
+  "/uv.lock",
+  "/**/__pycache__",
+  "/**/*.pyc",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["evalf"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+  "unit: fast isolated tests for a single module or class",
+  "integration: offline integration tests spanning multiple evalf modules",
+  "smoke: small critical-path checks that should stay fast and deterministic",
+]
+
+[tool.coverage.run]
+branch = true
+source_pkgs = ["evalf"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = [
+  ".git",
+  ".pytest_cache",
+  ".venv",
+  "dist",
+]
+
+[tool.ruff.lint]
+ignore = ["E501"]
+select = [
+  "B",
+  "E",
+  "F",
+  "I",
+  "UP",
+  "W",
+]
