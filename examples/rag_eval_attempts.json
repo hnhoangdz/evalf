@@ -1,0 +1,18 @@
+[
+  {
+    "id": "case-3",
+    "question": "Under FERPA, when do rights transfer from parents to a student?",
+    "retrieved_contexts": [
+      "When a student turns 18 years old, or enters a postsecondary institution at any age, the rights under FERPA transfer from the parents to the student."
+    ],
+    "reference_contexts": [
+      "When a student turns 18 years old, or enters a postsecondary institution at any age, the rights under FERPA transfer from the parents to the student."
+    ],
+    "expected_output": "Under FERPA, rights transfer when a student turns 18 years old or enters a postsecondary institution at any age.",
+    "attempts": [
+      {"actual_output": "Under FERPA, rights transfer only when a student turns 21 years old."},
+      {"actual_output": "Under FERPA, rights transfer when a student turns 18 years old or enters a postsecondary institution at any age."},
+      {"actual_output": "FERPA rights move from the parent to the student at age 18 or when the student enters a postsecondary institution at any age."}
+    ]
+  }
+]
