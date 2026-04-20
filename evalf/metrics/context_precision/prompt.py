@@ -126,10 +126,13 @@ Rules:
         ),
     ]
 
+
 _CONTEXT_PRECISION_COVERAGE_PROMPT = ContextPrecisionCoveragePrompt()
 
 
-def build_context_precision_prompt(case: EvalCase, reference_claims: list[Claim]) -> tuple[str, str]:
+def build_context_precision_prompt(
+    case: EvalCase, reference_claims: list[Claim]
+) -> tuple[str, str]:
     payload = ContextPrecisionCoverageInput(
         question=case.question or "",
         retrieved_contexts=build_context_chunks(case.retrieved_contexts or []),

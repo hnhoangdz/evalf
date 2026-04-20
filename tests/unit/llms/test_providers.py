@@ -13,7 +13,7 @@ def test_provider_models_estimate_cost_and_close_client(monkeypatch) -> None:
     model = OpenAILLMModel(
         model="gpt-4.1-mini",
         base_url="https://example.com/v1",
-        api_key="test-key",
+        api_key="test-key",  # pragma: allowlist secret
     )
 
     response = model.generate(
@@ -42,7 +42,7 @@ def test_provider_models_reject_empty_prompts(monkeypatch) -> None:
     model = OpenAILLMModel(
         model="gpt-4.1-mini",
         base_url="https://example.com/v1",
-        api_key="test-key",
+        api_key="test-key",  # pragma: allowlist secret
     )
 
     with pytest.raises(ValueError, match="system_prompt must be a non-empty string"):
@@ -60,13 +60,15 @@ def test_provider_models_reject_empty_prompts(monkeypatch) -> None:
         (ClaudeLLMModel, "claude"),
     ],
 )
-def test_provider_wrappers_set_expected_provider_name(monkeypatch, model_cls, expected_provider) -> None:
+def test_provider_wrappers_set_expected_provider_name(
+    monkeypatch, model_cls, expected_provider
+) -> None:
     monkeypatch.setattr("evalf.llms.providers.OpenAIClient", FakeProviderClient)
 
     model = model_cls(
         model="test-model",
         base_url="https://example.com/v1",
-        api_key="test-key",
+        api_key="test-key",  # pragma: allowlist secret
     )
 
     assert model.provider == expected_provider

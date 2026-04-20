@@ -68,9 +68,13 @@ def test_c4_metric_async_strict_mode_can_generate_summary_reason() -> None:
                 alignment_integrity=CriterionAssessment(score=0.75, reasoning="Mostly aligned."),
                 accuracy_consistency=CriterionAssessment(score=0.75, reasoning="Mostly accurate."),
                 safety_sovereignty_tone=CriterionAssessment(score=1.0, reasoning="Safe tone."),
-                completeness_coverage=CriterionAssessment(score=0.5, reasoning="Missing one detail."),
+                completeness_coverage=CriterionAssessment(
+                    score=0.5, reasoning="Missing one detail."
+                ),
             ),
-            C4SummaryReason(reason="The answer misses a key detail, so strict mode clamps the score."),
+            C4SummaryReason(
+                reason="The answer misses a key detail, so strict mode clamps the score."
+            ),
         ]
     )
 

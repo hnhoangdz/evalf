@@ -63,7 +63,8 @@ async def execute_cases(
             return await asyncio.wait_for(coro, timeout=per_sample_timeout_seconds)
 
     indexed_cases = [
-        (index, _sample_id_for_case(case, index=index), case) for index, case in enumerate(cases, start=1)
+        (index, _sample_id_for_case(case, index=index), case)
+        for index, case in enumerate(cases, start=1)
     ]
     tasks = [
         asyncio.create_task(run_case(case, sample_id), name=f"eval-{sample_id}")

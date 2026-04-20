@@ -22,7 +22,7 @@ def test_build_llm_uses_environment_defaults(monkeypatch) -> None:
     model = build_llm()
 
     assert model.kwargs["base_url"] == "https://api.openai.com/v1"
-    assert model.kwargs["api_key"] == "env-openai-key"
+    assert model.kwargs["api_key"] == "env-openai-key"  # pragma: allowlist secret
     assert model.kwargs["timeout_seconds"] == 30.0
     assert model.kwargs["max_retries"] == 2
     assert model.kwargs["temperature"] == 0.1
@@ -41,13 +41,13 @@ def test_build_llm_prefers_explicit_args_over_environment(monkeypatch) -> None:
 
     model = build_llm(
         model="gpt-4.1",
-        api_key="explicit-key",
+        api_key="explicit-key",  # pragma: allowlist secret
         timeout_seconds=12,
         max_tokens=99,
     )
 
     assert model.kwargs["model"] == "gpt-4.1"
-    assert model.kwargs["api_key"] == "explicit-key"
+    assert model.kwargs["api_key"] == "explicit-key"  # pragma: allowlist secret
     assert model.kwargs["timeout_seconds"] == 12
     assert model.kwargs["max_tokens"] == 99
 
@@ -70,7 +70,7 @@ def test_build_llm_does_not_reuse_provider_specific_env_from_other_provider(monk
     model = build_llm(provider="openai", model="gpt-4.1-mini")
 
     assert model.kwargs["base_url"] == "https://api.openai.com/v1"
-    assert model.kwargs["api_key"] == "openai-key"
+    assert model.kwargs["api_key"] == "openai-key"  # pragma: allowlist secret
 
 
 def test_build_llm_rejects_unsupported_providers() -> None:
@@ -90,12 +90,16 @@ def test_build_llm_rejects_provider_model_mismatches() -> None:
 
 
 def test_build_llm_requires_explicit_openai_compatible_base_url_for_claude() -> None:
-    with pytest.raises(ValueError, match="Provider 'claude' requires an explicit OpenAI-compatible base URL"):
+    with pytest.raises(
+        ValueError, match="Provider 'claude' requires an explicit OpenAI-compatible base URL"
+    ):
         build_llm(provider="claude", model="claude-sonnet-4")
 
 
 def test_build_llm_rejects_native_anthropic_base_url_for_claude() -> None:
-    with pytest.raises(ValueError, match="native endpoint 'https://api.anthropic.com/v1' is not supported"):
+    with pytest.raises(
+        ValueError, match="native endpoint 'https://api.anthropic.com/v1' is not supported"
+    ):
         build_llm(
             provider="claude",
             model="claude-sonnet-4",

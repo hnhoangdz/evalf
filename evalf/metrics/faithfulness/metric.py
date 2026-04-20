@@ -18,9 +18,7 @@ class FaithfulnessMetric(BaseDecomposedMetric):
     required_inputs = ("question", "retrieved_contexts", "actual_output")
     output_schema = FaithfulnessAssessment
 
-    def _extract_claims(
-        self, case: EvalCase, llm: BaseLLMModel
-    ) -> tuple[list[Claim], UsageStats]:
+    def _extract_claims(self, case: EvalCase, llm: BaseLLMModel) -> tuple[list[Claim], UsageStats]:
         """Extract atomic factual claims from the answer under evaluation."""
 
         system_prompt, user_prompt = build_claim_extraction_prompt(case)
@@ -74,7 +72,9 @@ class FaithfulnessMetric(BaseDecomposedMetric):
         )
         return assessment, usage
 
-    def _score_claims(self, claims: list[Claim], assessment: ClaimSupportAssessment) -> tuple[float, str]:
+    def _score_claims(
+        self, claims: list[Claim], assessment: ClaimSupportAssessment
+    ) -> tuple[float, str]:
         """Convert claim-level support verdicts into the final faithfulness score."""
 
         expected_ids = [claim.claim_id for claim in claims]
@@ -97,28 +97,23 @@ class FaithfulnessMetric(BaseDecomposedMetric):
 
         total_claims = len(claims)
         if total_claims == 0:
-            return 1.0, "Vacuous pass: the answer does not contain material factual claims to verify."
+            return (
+                1.0,
+                "Vacuous pass: the answer does not contain material factual claims to verify.",
+            )
 
         score = max(
             0.0,
-            (
-                len(supported)
-                - self.CONTRADICTION_PENALTY * len(contradicted)
-            )
-            / total_claims,
+            (len(supported) - self.CONTRADICTION_PENALTY * len(contradicted)) / total_claims,
         )
         reason_parts = [f"Supported {len(supported)}/{total_claims} material claim(s)."]
         if contradicted:
             reason_parts.append(
                 f"Contradicted claims apply an extra {self.CONTRADICTION_PENALTY:.1f} penalty each."
             )
-            reason_parts.append(
-                "Contradicted: " + "; ".join(contradicted[:2]) + "."
-            )
+            reason_parts.append("Contradicted: " + "; ".join(contradicted[:2]) + ".")
         if unsupported:
-            reason_parts.append(
-                "Unsupported: " + "; ".join(unsupported[:2]) + "."
-            )
+            reason_parts.append("Unsupported: " + "; ".join(unsupported[:2]) + ".")
         return score, " ".join(reason_parts)
 
     def compute_assessment(

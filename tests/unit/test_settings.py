@@ -111,9 +111,9 @@ def test_runtime_settings_direct_construction_normalizes_provider_and_metrics() 
     settings = RuntimeSettings(
         provider=" OpenAI ",
         metrics="faithfulness, answer_relevance",
-        api_key="explicit-key",
+        api_key="explicit-key",  # pragma: allowlist secret
     )
 
     assert settings.provider == "openai"
     assert settings.metrics == ["faithfulness", "answer_relevance"]
-    assert settings.api_key == "explicit-key"
+    assert settings.api_key == "explicit-key"  # pragma: allowlist secret

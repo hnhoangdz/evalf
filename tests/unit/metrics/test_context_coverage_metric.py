@@ -92,9 +92,7 @@ def test_scores_partial_coverage() -> None:
 
 def test_scores_zero_coverage() -> None:
     metric = ContextCoverageMetric(threshold=0.7)
-    llm = SequenceLLM(
-        [_make_assessment(score=0.0, verdict="no", reason="Completely unrelated.")]
-    )
+    llm = SequenceLLM([_make_assessment(score=0.0, verdict="no", reason="Completely unrelated.")])
 
     result = metric.measure(_make_case(), llm)
 
@@ -134,9 +132,7 @@ def test_strict_mode_disabled_keeps_original_score() -> None:
 
 def test_async_measure_scores_correctly() -> None:
     metric = ContextCoverageMetric(threshold=0.7)
-    llm = SequenceLLM(
-        [_make_assessment(score=0.75, verdict="yes", reason="Mostly covered.")]
-    )
+    llm = SequenceLLM([_make_assessment(score=0.75, verdict="yes", reason="Mostly covered.")])
 
     result = asyncio.run(metric.a_measure(_make_case(), llm))
 

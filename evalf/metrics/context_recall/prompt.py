@@ -25,7 +25,9 @@ class ContextRecallCoverageInput(BaseModel):
     reference_claims: list[Claim]
 
 
-class ReferenceClaimExtractionPrompt(PydanticPrompt[ReferenceClaimExtractionInput, ClaimExtraction]):
+class ReferenceClaimExtractionPrompt(
+    PydanticPrompt[ReferenceClaimExtractionInput, ClaimExtraction]
+):
     input_model = ReferenceClaimExtractionInput
     output_model = ClaimExtraction
     system_prompt = (
@@ -204,6 +206,7 @@ Rules:
             ),
         ),
     ]
+
 
 _REFERENCE_CLAIM_EXTRACTION_PROMPT = ReferenceClaimExtractionPrompt()
 _CONTEXT_RECALL_COVERAGE_PROMPT = ContextRecallCoveragePrompt()

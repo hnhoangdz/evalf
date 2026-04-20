@@ -525,9 +525,7 @@ def test_context_coverage_metric_scores_single_call_assessment() -> None:
 
 def test_context_coverage_strict_mode_clamps_below_threshold() -> None:
     metric = ContextCoverageMetric(threshold=0.7, strict_mode=True)
-    llm = FakeLLM(
-        [CoverageAssessment(score=0.5, verdict="no", reason="Missing key facts.")]
-    )
+    llm = FakeLLM([CoverageAssessment(score=0.5, verdict="no", reason="Missing key facts.")])
 
     result = metric.measure(
         EvalCase(

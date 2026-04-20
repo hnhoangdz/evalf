@@ -40,7 +40,7 @@ def test_provider_model_integrates_with_metric_and_cost_estimation(monkeypatch) 
     llm = OpenAILLMModel(
         model="gpt-4.1-mini",
         base_url="https://example.com/v1",
-        api_key="test-key",
+        api_key="test-key",  # pragma: allowlist secret
     )
     metric = AnswerCorrectnessMetric(threshold=0.7)
 

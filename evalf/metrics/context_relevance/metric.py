@@ -59,7 +59,9 @@ class ContextRelevanceMetric(BaseDecomposedMetric):
     ) -> tuple[float, str]:
         """Convert per-context verdicts into a normalized relevance score."""
 
-        expected_context_ids = [f"ctx_{index}" for index in range(1, len(case.retrieved_contexts or []) + 1)]
+        expected_context_ids = [
+            f"ctx_{index}" for index in range(1, len(case.retrieved_contexts or []) + 1)
+        ]
         observed_context_ids = [verdict.context_id for verdict in assessment.verdicts]
         ensure_complete_id_mapping(
             expected_ids=expected_context_ids,

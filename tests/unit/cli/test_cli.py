@@ -59,7 +59,7 @@ def test_main_run_uses_runtime_defaults_and_writes_report(monkeypatch, capsys) -
                 "provider": "openai",
                 "model": "gpt-4.1-mini",
                 "base_url": "https://api.openai.com/v1",
-                "api_key": "key",
+                "api_key": "key",  # pragma: allowlist secret
                 "metrics": ["faithfulness"],
                 "threshold": 0.7,
                 "metric_mode": "pass@k",
@@ -143,7 +143,7 @@ def test_main_run_supports_distinct_request_and_per_sample_timeouts(monkeypatch)
                 "provider": "openai",
                 "model": "gpt-4.1-mini",
                 "base_url": "https://api.openai.com/v1",
-                "api_key": "key",
+                "api_key": "key",  # pragma: allowlist secret
                 "metrics": ["faithfulness"],
                 "threshold": 0.7,
                 "metric_mode": "pass@k",
@@ -222,7 +222,7 @@ def test_main_run_passes_c4_options_to_build_metrics(monkeypatch, capsys) -> Non
                 "provider": "openai",
                 "model": "gpt-4.1-mini",
                 "base_url": "https://api.openai.com/v1",
-                "api_key": "key",
+                "api_key": "key",  # pragma: allowlist secret
                 "metrics": ["c4"],
                 "threshold": 0.7,
                 "metric_mode": "pass@k",
@@ -347,7 +347,7 @@ def test_build_judge_settings_preserves_explicit_zero_max_tokens() -> None:
             "provider": "openai",
             "model": "gpt-4.1-mini",
             "base_url": "https://api.openai.com/v1",
-            "api_key": "key",
+            "api_key": "key",  # pragma: allowlist secret
             "request_timeout_seconds": 60.0,
             "max_retries": 3,
             "temperature": 0.0,
@@ -381,7 +381,7 @@ def test_run_command_preserves_explicit_zero_k(monkeypatch) -> None:
                 "provider": "openai",
                 "model": "gpt-4.1-mini",
                 "base_url": "https://api.openai.com/v1",
-                "api_key": "key",
+                "api_key": "key",  # pragma: allowlist secret
                 "metrics": ["faithfulness"],
                 "threshold": 0.7,
                 "metric_mode": "pass@k",

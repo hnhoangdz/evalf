@@ -80,7 +80,9 @@ class ContextRecallMetric(BaseDecomposedMetric):
         expected_ids = [claim.claim_id for claim in reference_claims]
         observed_ids = [verdict.claim_id for verdict in assessment.verdicts]
         if expected_ids != observed_ids:
-            raise ValueError("Context recall verdict ids must exactly match the reference claim ids.")
+            raise ValueError(
+                "Context recall verdict ids must exactly match the reference claim ids."
+            )
 
         claims_by_id = {claim.claim_id: claim for claim in reference_claims}
         supported: list[str] = []
@@ -100,7 +102,9 @@ class ContextRecallMetric(BaseDecomposedMetric):
             )
 
         score = len(supported) / total_claims
-        reason_parts = [f"Retrieved contexts cover {len(supported)}/{total_claims} reference claim(s)."]
+        reason_parts = [
+            f"Retrieved contexts cover {len(supported)}/{total_claims} reference claim(s)."
+        ]
         if missing:
             reason_parts.append("Missing: " + "; ".join(missing[:2]) + ".")
         return score, " ".join(reason_parts)

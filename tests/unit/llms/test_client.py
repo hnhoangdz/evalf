@@ -38,7 +38,7 @@ def test_openai_client_returns_parsed_output_when_parse_succeeds(monkeypatch) ->
 
     client = OpenAIClient(
         base_url="https://example.com/v1",
-        api_key="test-key",
+        api_key="test-key",  # pragma: allowlist secret
         provider="openai",
     )
     response = client.create_chat_completion(
@@ -78,7 +78,7 @@ def test_openai_client_falls_back_to_plain_completion_when_parse_fails(monkeypat
 
     client = OpenAIClient(
         base_url="https://example.com/v1",
-        api_key="test-key",
+        api_key="test-key",  # pragma: allowlist secret
         provider="openai",
     )
     response = client.create_chat_completion(
@@ -104,12 +104,16 @@ def test_openai_client_does_not_fallback_when_parsed_response_has_no_choices(mon
         create_responses=[make_openai_response(content='{"score": 0.6}', parsed=None)],
     )
     async_completions = AsyncFakeCompletions()
-    monkeypatch.setattr("evalf.llms.client.OpenAI", lambda **kwargs: FakeSyncOpenAI(sync_completions))
-    monkeypatch.setattr("evalf.llms.client.AsyncOpenAI", lambda **kwargs: FakeAsyncOpenAI(async_completions))
+    monkeypatch.setattr(
+        "evalf.llms.client.OpenAI", lambda **kwargs: FakeSyncOpenAI(sync_completions)
+    )
+    monkeypatch.setattr(
+        "evalf.llms.client.AsyncOpenAI", lambda **kwargs: FakeAsyncOpenAI(async_completions)
+    )
 
     client = OpenAIClient(
         base_url="https://example.com/v1",
-        api_key="test-key",
+        api_key="test-key",  # pragma: allowlist secret
         provider="openai",
     )
 
@@ -140,13 +144,17 @@ def test_openai_client_logs_parse_fallback_and_resets_latency(monkeypatch, caplo
     )
     async_completions = AsyncFakeCompletions()
     perf_counter_values = iter([1.0, 10.0, 11.0])
-    monkeypatch.setattr("evalf.llms.client.OpenAI", lambda **kwargs: FakeSyncOpenAI(sync_completions))
-    monkeypatch.setattr("evalf.llms.client.AsyncOpenAI", lambda **kwargs: FakeAsyncOpenAI(async_completions))
+    monkeypatch.setattr(
+        "evalf.llms.client.OpenAI", lambda **kwargs: FakeSyncOpenAI(sync_completions)
+    )
+    monkeypatch.setattr(
+        "evalf.llms.client.AsyncOpenAI", lambda **kwargs: FakeAsyncOpenAI(async_completions)
+    )
     monkeypatch.setattr("evalf.llms.client.time.perf_counter", lambda: next(perf_counter_values))
 
     client = OpenAIClient(
         base_url="https://example.com/v1",
-        api_key="test-key",
+        api_key="test-key",  # pragma: allowlist secret
         provider="openai",
     )
 
@@ -183,7 +191,7 @@ def test_openai_client_does_not_fallback_or_retry_on_non_retryable_parse_errors(
 
     client = OpenAIClient(
         base_url="https://example.com/v1",
-        api_key="test-key",
+        api_key="test-key",  # pragma: allowlist secret
         provider="openai",
         max_retries=3,
     )
@@ -213,7 +221,7 @@ def test_openai_client_does_not_fallback_or_retry_on_non_retryable_parse_errors(
     )
     retry_client = OpenAIClient(
         base_url="https://example.com/v1",
-        api_key="test-key",
+        api_key="test-key",  # pragma: allowlist secret
         provider="openai",
         max_retries=1,
     )
@@ -245,13 +253,17 @@ def test_openai_client_uses_retry_after_header_for_sync_retries(monkeypatch) -> 
     )
     async_completions = AsyncFakeCompletions()
     delays: list[float] = []
-    monkeypatch.setattr("evalf.llms.client.OpenAI", lambda **kwargs: FakeSyncOpenAI(sync_completions))
-    monkeypatch.setattr("evalf.llms.client.AsyncOpenAI", lambda **kwargs: FakeAsyncOpenAI(async_completions))
+    monkeypatch.setattr(
+        "evalf.llms.client.OpenAI", lambda **kwargs: FakeSyncOpenAI(sync_completions)
+    )
+    monkeypatch.setattr(
+        "evalf.llms.client.AsyncOpenAI", lambda **kwargs: FakeAsyncOpenAI(async_completions)
+    )
     monkeypatch.setattr("evalf.llms.client.time.sleep", delays.append)
 
     client = OpenAIClient(
         base_url="https://example.com/v1",
-        api_key="test-key",
+        api_key="test-key",  # pragma: allowlist secret
         provider="openai",
         max_retries=1,
     )
@@ -282,13 +294,17 @@ def test_openai_client_caps_retry_after_header_for_sync_retries(monkeypatch) -> 
     )
     async_completions = AsyncFakeCompletions()
     delays: list[float] = []
-    monkeypatch.setattr("evalf.llms.client.OpenAI", lambda **kwargs: FakeSyncOpenAI(sync_completions))
-    monkeypatch.setattr("evalf.llms.client.AsyncOpenAI", lambda **kwargs: FakeAsyncOpenAI(async_completions))
+    monkeypatch.setattr(
+        "evalf.llms.client.OpenAI", lambda **kwargs: FakeSyncOpenAI(sync_completions)
+    )
+    monkeypatch.setattr(
+        "evalf.llms.client.AsyncOpenAI", lambda **kwargs: FakeAsyncOpenAI(async_completions)
+    )
     monkeypatch.setattr("evalf.llms.client.time.sleep", delays.append)
 
     client = OpenAIClient(
         base_url="https://example.com/v1",
-        api_key="test-key",
+        api_key="test-key",  # pragma: allowlist secret
         provider="openai",
         max_retries=1,
     )
@@ -314,14 +330,18 @@ def test_openai_client_uses_jittered_backoff_when_retry_after_missing(monkeypatc
     )
     async_completions = AsyncFakeCompletions()
     delays: list[float] = []
-    monkeypatch.setattr("evalf.llms.client.OpenAI", lambda **kwargs: FakeSyncOpenAI(sync_completions))
-    monkeypatch.setattr("evalf.llms.client.AsyncOpenAI", lambda **kwargs: FakeAsyncOpenAI(async_completions))
+    monkeypatch.setattr(
+        "evalf.llms.client.OpenAI", lambda **kwargs: FakeSyncOpenAI(sync_completions)
+    )
+    monkeypatch.setattr(
+        "evalf.llms.client.AsyncOpenAI", lambda **kwargs: FakeAsyncOpenAI(async_completions)
+    )
     monkeypatch.setattr("evalf.llms.client.random.uniform", lambda start, end: 0.125)
     monkeypatch.setattr("evalf.llms.client.time.sleep", delays.append)
 
     client = OpenAIClient(
         base_url="https://example.com/v1",
-        api_key="test-key",
+        api_key="test-key",  # pragma: allowlist secret
         provider="openai",
         max_retries=1,
     )
@@ -346,14 +366,18 @@ def test_openai_client_logs_retry_warnings(monkeypatch, caplog) -> None:
         create_responses=[transient_error, make_openai_response(content='{"score": 0.4}')]
     )
     async_completions = AsyncFakeCompletions()
-    monkeypatch.setattr("evalf.llms.client.OpenAI", lambda **kwargs: FakeSyncOpenAI(sync_completions))
-    monkeypatch.setattr("evalf.llms.client.AsyncOpenAI", lambda **kwargs: FakeAsyncOpenAI(async_completions))
+    monkeypatch.setattr(
+        "evalf.llms.client.OpenAI", lambda **kwargs: FakeSyncOpenAI(sync_completions)
+    )
+    monkeypatch.setattr(
+        "evalf.llms.client.AsyncOpenAI", lambda **kwargs: FakeAsyncOpenAI(async_completions)
+    )
     monkeypatch.setattr("evalf.llms.client.random.uniform", lambda start, end: 0.125)
     monkeypatch.setattr("evalf.llms.client.time.sleep", lambda delay: None)
 
     client = OpenAIClient(
         base_url="https://example.com/v1",
-        api_key="test-key",
+        api_key="test-key",  # pragma: allowlist secret
         provider="openai",
         max_retries=1,
     )
@@ -395,7 +419,7 @@ def test_openai_client_async_retries_then_succeeds(monkeypatch) -> None:
 
     client = OpenAIClient(
         base_url="https://example.com/v1",
-        api_key="test-key",
+        api_key="test-key",  # pragma: allowlist secret
         provider="openai",
         max_retries=1,
     )
@@ -434,13 +458,17 @@ def test_openai_client_async_uses_retry_after_header(monkeypatch) -> None:
     async def capture_sleep(delay: float) -> None:
         delays.append(delay)
 
-    monkeypatch.setattr("evalf.llms.client.OpenAI", lambda **kwargs: FakeSyncOpenAI(sync_completions))
-    monkeypatch.setattr("evalf.llms.client.AsyncOpenAI", lambda **kwargs: FakeAsyncOpenAI(async_completions))
+    monkeypatch.setattr(
+        "evalf.llms.client.OpenAI", lambda **kwargs: FakeSyncOpenAI(sync_completions)
+    )
+    monkeypatch.setattr(
+        "evalf.llms.client.AsyncOpenAI", lambda **kwargs: FakeAsyncOpenAI(async_completions)
+    )
     monkeypatch.setattr("evalf.llms.client.asyncio.sleep", capture_sleep)
 
     client = OpenAIClient(
         base_url="https://example.com/v1",
-        api_key="test-key",
+        api_key="test-key",  # pragma: allowlist secret
         provider="openai",
         max_retries=1,
     )
@@ -468,7 +496,7 @@ def test_openai_client_close_methods_close_underlying_clients(monkeypatch) -> No
 
     client = OpenAIClient(
         base_url="https://example.com/v1",
-        api_key="test-key",
+        api_key="test-key",  # pragma: allowlist secret
         provider="openai",
     )
     client.close()

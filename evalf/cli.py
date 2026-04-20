@@ -295,7 +295,9 @@ def cli(ctx: click.Context) -> None:
     help="Timeout in seconds for evaluating one sample across all metrics.",
 )
 @click.option("--temperature", type=float, help="Sampling temperature passed to the judge model.")
-@click.option("--max-tokens", type=int, help="Maximum completion tokens requested from the judge model.")
+@click.option(
+    "--max-tokens", type=int, help="Maximum completion tokens requested from the judge model."
+)
 @click.option(
     "--output",
     type=str,

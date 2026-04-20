@@ -13,9 +13,7 @@ class AnswerRelevancePromptInput(BaseModel):
     actual_output: str
 
 
-class AnswerRelevancePrompt(
-    PydanticPrompt[AnswerRelevancePromptInput, AnswerRelevanceAssessment]
-):
+class AnswerRelevancePrompt(PydanticPrompt[AnswerRelevancePromptInput, AnswerRelevanceAssessment]):
     input_model = AnswerRelevancePromptInput
     output_model = AnswerRelevanceAssessment
     system_prompt = (
@@ -84,6 +82,7 @@ Reason requirements:
             ),
         ),
     ]
+
 
 _ANSWER_RELEVANCE_PROMPT = AnswerRelevancePrompt()
 

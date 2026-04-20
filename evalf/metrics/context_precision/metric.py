@@ -87,7 +87,9 @@ class ContextPrecisionMetric(BaseDecomposedMetric):
     ) -> tuple[float, str]:
         """Compute rank-weighted precision from context usefulness verdicts."""
 
-        expected_context_ids = [f"ctx_{index}" for index in range(1, len(case.retrieved_contexts or []) + 1)]
+        expected_context_ids = [
+            f"ctx_{index}" for index in range(1, len(case.retrieved_contexts or []) + 1)
+        ]
         observed_context_ids = [context.context_id for context in assessment.contexts]
         ensure_complete_id_mapping(
             expected_ids=expected_context_ids,
@@ -124,7 +126,9 @@ class ContextPrecisionMetric(BaseDecomposedMetric):
                     + "."
                 )
 
-            new_claims = [claim_id for claim_id in supported_claim_ids if claim_id not in seen_claims]
+            new_claims = [
+                claim_id for claim_id in supported_claim_ids if claim_id not in seen_claims
+            ]
             if new_claims:
                 useful_context_count += 1
                 seen_claims.update(new_claims)

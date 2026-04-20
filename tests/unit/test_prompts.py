@@ -68,7 +68,9 @@ def test_c4_prompts_do_not_require_vietnamese_reasoning() -> None:
         },
     )
 
-    combined_text = "\n".join([system_prompt, user_prompt, reason_system_prompt, reason_user_prompt])
+    combined_text = "\n".join(
+        [system_prompt, user_prompt, reason_system_prompt, reason_user_prompt]
+    )
 
     assert "Vietnamese" not in combined_text
     assert "same language" in combined_text

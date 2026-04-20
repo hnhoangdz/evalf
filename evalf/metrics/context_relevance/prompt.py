@@ -76,9 +76,7 @@ Rules:
                 question="When do FERPA rights transfer from parents to a student?",
                 retrieved_contexts=build_context_chunks(
                     [
-                        (
-                            "FERPA is a federal privacy law that protects education records."
-                        ),
+                        ("FERPA is a federal privacy law that protects education records."),
                         (
                             "When a student turns 18 years old, or enters a postsecondary "
                             "institution at any age, FERPA rights transfer from the parents "
@@ -103,6 +101,7 @@ Rules:
             ),
         ),
     ]
+
 
 _CONTEXT_RELEVANCE_PROMPT = ContextRelevancePrompt()
 

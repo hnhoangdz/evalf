@@ -14,9 +14,7 @@ class ContextCoveragePromptInput(BaseModel):
     reference_contexts: list[str]
 
 
-class ContextCoveragePrompt(
-    PydanticPrompt[ContextCoveragePromptInput, ContextCoverageAssessment]
-):
+class ContextCoveragePrompt(PydanticPrompt[ContextCoveragePromptInput, ContextCoverageAssessment]):
     input_model = ContextCoveragePromptInput
     output_model = ContextCoverageAssessment
     system_prompt = (
@@ -27,7 +25,7 @@ class ContextCoveragePrompt(
         "2. Read the **Reference Contexts** — this is the ground-truth source containing the correct information.\n"
         "3. Read the **Retrieval Contexts** — this is what the system actually retrieved.\n"
         "4. Check: does the Retrieval Contexts have the key information needed to answer the question?\n"
-        "5. Give a **score** (0.0–1.0), a **verdict** (\"yes\" or \"no\"), and a short **reason**.\n\n"
+        '5. Give a **score** (0.0–1.0), a **verdict** ("yes" or "no"), and a short **reason**.\n\n'
         "## Key Principle:\n"
         "The Reference Contexts can be much LONGER or SHORTER than the Retrieval Contexts. That is fine. "
         "What matters is: does the Retrieval Contexts contain the **important facts** needed to answer the question? "
@@ -101,9 +99,7 @@ If there is ANY Vietnamese language in the User Input or contexts, the reason MU
         (
             ContextCoveragePromptInput(
                 question="What qualifies as a service animal under the ADA?",
-                retrieval_contexts=[
-                    "Under the ADA, a service animal is defined as a dog."
-                ],
+                retrieval_contexts=["Under the ADA, a service animal is defined as a dog."],
                 reference_contexts=[
                     "Under the ADA, a service animal is a dog.",
                     (
