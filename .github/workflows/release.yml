@@ -1,0 +1,61 @@
+name: release
+
+on:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Run pre-commit checks
+        run: uv run pre-commit run --all-files
+
+      - name: Check Python syntax
+        run: uv run python -m compileall evalf tests
+
+      - name: Run tests with coverage
+        run: uv run pytest --cov=evalf --cov-report=term-missing --cov-fail-under=84
+
+      - name: Build distributions
+        run: uv build
+
+      - name: Check distributions
+        run: uv run python -m twine check dist/*
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/*
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

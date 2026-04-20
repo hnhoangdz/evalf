@@ -1,0 +1,36 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Run pre-commit checks
+        run: uv run pre-commit run --all-files
+
+      - name: Check Python syntax
+        run: uv run python -m compileall evalf tests
+
+      - name: Run tests with coverage
+        run: uv run pytest --cov=evalf --cov-report=term-missing --cov-fail-under=84
