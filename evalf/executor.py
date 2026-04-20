@@ -1,17 +1,47 @@
 from __future__ import annotations
 
 import asyncio
+import sys
 import uuid
+from collections.abc import Callable
 
 from evalf.llms.base import BaseLLMModel
 from evalf.metrics.base import BaseMetric
 from evalf.reporting import build_run_summary
 from evalf.schemas import EvalCase, MetricResult, RunReport, SampleResult, UsageStats
 
+ProgressCallback = Callable[[int, int, SampleResult], None]
+
 
 def _sample_id_for_case(case: EvalCase, *, index: int) -> str:
     """Return the stable sample id used for both success and error paths."""
     return case.id or f"sample-{index}"
+
+
+def _format_cost(cost: float | None) -> str:
+    if cost is None:
+        return "-"
+    return f"${cost:.4f}"
+
+
+def _format_latency(ms: float | None) -> str:
+    if ms is None:
+        return "-"
+    return f"{ms / 1000:.1f}s"
+
+
+def _default_progress(current: int, total: int, result: SampleResult) -> None:
+    """Write a one-line per-sample progress update to stderr."""
+    status_icon = {"passed": "+", "failed": "x", "skipped": "-"}.get(result.status, "?")
+    n_metrics = len(result.metrics)
+    latency = _format_latency(result.usage.latency_ms)
+    cost = _format_cost(result.usage.cost_usd)
+    sys.stderr.write(
+        f"  [{current}/{total}] {result.sample_id} "
+        f"{result.status} ({status_icon}) "
+        f"| {n_metrics} metrics | {latency} | {cost}\n"
+    )
+    sys.stderr.flush()
 
 
 async def _evaluate_case(
@@ -51,9 +81,13 @@ async def execute_cases(
     llm: BaseLLMModel,
     concurrency: int = 4,
     per_sample_timeout_seconds: float | None = None,
+    on_sample_done: ProgressCallback | None = _default_progress,
 ) -> RunReport:
     """Evaluate a batch of cases concurrently with bounded per-sample timeouts."""
     semaphore = asyncio.Semaphore(max(1, concurrency))
+    total = len(cases)
+    completed_count = 0
+    count_lock = asyncio.Lock()
 
     async def run_case(case: EvalCase, sample_id: str) -> SampleResult:
         async with semaphore:
@@ -78,26 +112,31 @@ async def execute_cases(
         strict=True,
     ):
         if isinstance(result, BaseException):
-            sample_results.append(
-                SampleResult(
-                    sample_id=sample_id,
-                    status="failed",
-                    metrics=[
-                        MetricResult(
-                            name="executor",
-                            status="error",
-                            score=None,
-                            threshold=0.0,
-                            passed=False,
-                            error=f"{type(result).__name__}: {result}",
-                        )
-                    ],
-                    usage=UsageStats.empty(),
-                    metadata=case.metadata,
-                )
+            sample_result = SampleResult(
+                sample_id=sample_id,
+                status="failed",
+                metrics=[
+                    MetricResult(
+                        name="executor",
+                        status="error",
+                        score=None,
+                        threshold=0.0,
+                        passed=False,
+                        error=f"{type(result).__name__}: {result}",
+                    )
+                ],
+                usage=UsageStats.empty(),
+                metadata=case.metadata,
             )
-            continue
-        sample_results.append(result)
+        else:
+            sample_result = result
+
+        sample_results.append(sample_result)
+
+        if on_sample_done is not None:
+            async with count_lock:
+                completed_count += 1
+                on_sample_done(completed_count, total, sample_result)
 
     summary = build_run_summary(sample_results)
     return RunReport(
@@ -112,36 +151,40 @@ def execute_cases_sync(
     cases: list[EvalCase],
     metrics: list[BaseMetric],
     llm: BaseLLMModel,
+    on_sample_done: ProgressCallback | None = _default_progress,
 ) -> RunReport:
     """Evaluate a batch of cases synchronously for tests and local utilities."""
+    total = len(cases)
     sample_results: list[SampleResult] = []
     for index, case in enumerate(cases, start=1):
         sample_id = _sample_id_for_case(case, index=index)
         try:
-            sample_results.append(
-                _evaluate_case_sync(case=case, sample_id=sample_id, metrics=metrics, llm=llm)
+            sample_result = _evaluate_case_sync(
+                case=case, sample_id=sample_id, metrics=metrics, llm=llm
             )
         except BaseException as result:
             if isinstance(result, (KeyboardInterrupt, SystemExit)):
                 raise
-            sample_results.append(
-                SampleResult(
-                    sample_id=sample_id,
-                    status="failed",
-                    metrics=[
-                        MetricResult(
-                            name="executor",
-                            status="error",
-                            score=None,
-                            threshold=0.0,
-                            passed=False,
-                            error=f"{type(result).__name__}: {result}",
-                        )
-                    ],
-                    usage=UsageStats.empty(),
-                    metadata=case.metadata,
-                )
+            sample_result = SampleResult(
+                sample_id=sample_id,
+                status="failed",
+                metrics=[
+                    MetricResult(
+                        name="executor",
+                        status="error",
+                        score=None,
+                        threshold=0.0,
+                        passed=False,
+                        error=f"{type(result).__name__}: {result}",
+                    )
+                ],
+                usage=UsageStats.empty(),
+                metadata=case.metadata,
             )
+
+        sample_results.append(sample_result)
+        if on_sample_done is not None:
+            on_sample_done(index, total, sample_result)
 
     summary = build_run_summary(sample_results)
     return RunReport(

@@ -6,9 +6,21 @@ The format is based on Keep a Changelog.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-04-20
+
 ### Added
 
-- New `context_coverage` metric: single-call LLM judge that scores whether retrieved contexts cover enough key information from reference contexts to answer the question. Supports `strict_mode` to clamp below-threshold scores to `0.0`.
+- Per-sample progress logging to stderr for both CLI and Python API. Each sample now prints status, metric count, latency, and cost as it completes.
+- CLI header and footer: run config summary before evaluation starts, and pass/fail/cost summary after.
+- Pre-commit hook to detect hardcoded API keys (OpenAI, Anthropic, Gemini).
+- Input validation for malformed JSON: non-object items in `--sample-json` or input files now raise a clean error instead of a raw traceback.
+
+### Fixed
+
+- Gemini and newer models failing with `LengthFinishReasonError` due to the deprecated `max_tokens` API parameter. Internally switched to `max_completion_tokens` (user-facing parameter name unchanged).
+- `.codex` leaking into sdist despite exclude rules in `pyproject.toml`.
+- detect-secrets false positives on test dummy keys.
+- End-of-file and ruff formatting issues flagged by pre-commit.
 
 ## [1.0.0] - 2026-04-18
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import sys
+import time
 from collections.abc import Sequence
 from contextlib import suppress
 
@@ -14,6 +15,7 @@ from evalf.llms.base import BaseLLMModel
 from evalf.llms.factory import build_llm
 from evalf.metrics import build_metrics, list_metric_names
 from evalf.reporting import report_to_json, write_report
+from evalf.schemas import RunReport
 from evalf.settings import RuntimeSettings, load_runtime_settings
 from evalf.utils import split_csv
 
@@ -102,6 +104,42 @@ def _build_judge_settings(
         max_retries=defaults.max_retries,
         temperature=temperature if temperature is not None else defaults.temperature,
         max_tokens=max_tokens if max_tokens is not None else defaults.max_tokens,
+    )
+
+
+def _log_header(
+    *,
+    n_cases: int,
+    metric_names: list[str],
+    provider: str,
+    model: str,
+    concurrency: int,
+) -> None:
+    """Print a run summary header to stderr before evaluation starts."""
+    metrics_str = ", ".join(metric_names)
+    click.echo(
+        f"evalf: evaluating {n_cases} sample(s) with {len(metric_names)} metric(s) [{metrics_str}]",
+        err=True,
+    )
+    click.echo(
+        f"evalf: judge={provider}/{model} | concurrency={concurrency}",
+        err=True,
+    )
+    click.echo("", err=True)
+
+
+def _log_footer(report: RunReport, *, elapsed_seconds: float) -> None:
+    """Print a run summary footer to stderr after evaluation completes."""
+    s = report.summary
+    cost_str = f"${s.total_cost_usd:.4f}" if s.total_cost_usd is not None else "-"
+    click.echo("", err=True)
+    click.echo(
+        f"evalf: done — "
+        f"{s.passed_samples} passed, "
+        f"{s.failed_samples} failed, "
+        f"{s.skipped_samples} skipped "
+        f"| {elapsed_seconds:.1f}s | {cost_str}",
+        err=True,
     )
 
 
@@ -217,13 +255,26 @@ def _run_command(
             max_tokens=judge_settings.max_tokens,
         )
 
+        resolved_concurrency = concurrency or defaults.concurrency
+        _log_header(
+            n_cases=len(cases),
+            metric_names=resolved_metrics,
+            provider=judge_settings.provider,
+            model=judge_settings.model,
+            concurrency=resolved_concurrency,
+        )
+
+        start_time = time.monotonic()
         report = evaluate(
             cases=cases,
             metrics=resolved_metric_objects,
             judge=judge,
-            concurrency=concurrency or defaults.concurrency,
+            concurrency=resolved_concurrency,
             per_sample_timeout_seconds=resolved_per_sample_timeout_seconds,
         )
+        elapsed = time.monotonic() - start_time
+
+        _log_footer(report, elapsed_seconds=elapsed)
 
         output_path = output or defaults.output_path
         write_report(report, output_path)

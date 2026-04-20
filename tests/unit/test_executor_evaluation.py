@@ -258,6 +258,7 @@ def test_execute_cases_timeout_preserves_case_id_and_metadata() -> None:
             metrics=[SlowMetric()],
             llm=QueueLLM([]),
             per_sample_timeout_seconds=0.001,
+            on_sample_done=None,
         )
 
     report = asyncio.run(run_test())
@@ -274,6 +275,7 @@ def test_execute_cases_converts_cancelled_error_results_into_executor_errors() -
             cases=[EvalCase(id="case-cancel", question="q", actual_output="a")],
             metrics=[CancelledMetric()],
             llm=QueueLLM([]),
+            on_sample_done=None,
         )
 
     report = asyncio.run(run_test())
@@ -289,6 +291,7 @@ def test_execute_cases_sync_converts_cancelled_error_results_into_executor_error
         cases=[EvalCase(id="case-cancel", question="q", actual_output="a")],
         metrics=[CancelledMetric()],
         llm=QueueLLM([]),
+        on_sample_done=None,
     )
 
     assert report.samples[0].sample_id == "case-cancel"
